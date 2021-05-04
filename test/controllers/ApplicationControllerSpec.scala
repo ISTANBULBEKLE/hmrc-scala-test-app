@@ -34,15 +34,15 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
   implicit val system: ActorSystem = ActorSystem("Sys")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
+  val dataModel: DataModel = DataModel(
+    "abcd",
+    "test name",
+    "test description",
+    100
+  )
+
 
   "ApplicationController .index" should {
-
-    val dataModel: DataModel = DataModel(
-      "abcd",
-      "test name",
-      "test description",
-      100
-    )
 
     when(mockDataRepository.find(any())(any()))
       .thenReturn(Future(List(dataModel)))
@@ -96,35 +96,36 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
   }
 
   "ApplicationController .update()" should {
-//        "the json body is valid" should {
-//          val jsonBody: JsObject = Json.obj(
-//            "_id" -> "abcd",
-//            "name" -> "test name",
-//            "description" -> "test description",
-//            "numSales" -> 100
-//          )
-//
-//          lazy val result = TestApplicationController.index()(FakeRequest())
-//
-//          "return the correct JSON" in {
-//            await(jsonBodyOf(result)) shouldBe jsonBody
-//            status(result) shouldBe Status.ACCEPTED
-//          }
-//        }
-//
-//        "the json body is not valid" should {
-//          val jsonBody: JsObject = Json.obj(
-//            "_id" -> "abcd",
-//            "test" -> "test name"
-//          )
-//
-//          lazy val result = TestApplicationController.index()(FakeRequest())
-//
-//          "return the incorrect JSON" in {
-//            await(jsonBodyOf(result)) shouldBe jsonBody
-//            status(result) shouldBe Status.BAD_REQUEST
-//          }
-//        }
+        "the json body is valid" should {
+          val jsonBody: JsObject = Json.obj(
+            "_id" -> "abcd",
+            "name" -> "test name",
+            "description" -> "test description",
+            "numSales" -> 100
+          )
+
+          "return <status code>" in {
+            when(mockDataRepository.update(dataModel))
+                .thenReturn(Future(dataModel))
+            val result = TestApplicationController.update("_id":String)(FakeRequest().withBody(jsonBody))
+            status(result) shouldBe Status.ACCEPTED
+          }
+          "return JSON body" in {
+            val result = TestApplicationController.update("_id":String)(FakeRequest().withBody(jsonBody))
+            await(jsonBodyOf(result)) shouldBe jsonBody
+          }
+        }
+
+        "json body is not valid" should {
+          val jsonBody: JsObject = Json.obj(
+            "unexpected field" -> "foo"
+          )
+           "returned status code" in {
+             val result = TestApplicationController.update("_id":String)(FakeRequest().withBody(jsonBody))
+             status(result) shouldBe Status.BAD_REQUEST
+          }
+
+        }
 
   }
 
