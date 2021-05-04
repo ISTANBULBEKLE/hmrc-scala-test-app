@@ -44,14 +44,28 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
 
   "ApplicationController .index" should {
 
-    when(mockDataRepository.find(any())(any()))
-      .thenReturn(Future(List(dataModel)))
+    "return OK" in{
+      when(mockDataRepository.find(any())(any()))
+          .thenReturn(Future(List(dataModel)))
 
-    val result = TestApplicationController.index()(FakeRequest())
-
-    "return TODO" in {
+      val result = TestApplicationController.index()(FakeRequest())
       status(result) shouldBe Status.OK
     }
+
+
+//    "checking JSON body" in {
+//      val jsonBody: JsObject = Json.obj(
+//        "_id" -> "abcd",
+//        "name" -> "test name",
+//        "description" -> "test description",
+//        "numSales" -> 100
+//      )
+//      val result = TestApplicationController.index()(FakeRequest())
+//      status(result) shouldBe Status.OK
+//      await(jsonBodyOf(result)) shouldBe jsonBody
+//    }
+
+
   }
 
   "ApplicationController .create()" should {
@@ -92,7 +106,13 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
   }
 
   "ApplicationController .read()" should {
+    "return OK" in {
+      when(mockDataRepository.read(any()))
+          .thenReturn(Future(dataModel))
 
+      val result = TestApplicationController.read("_id":String)(FakeRequest())
+      status(result) shouldBe Status.OK
+    }
   }
 
   "ApplicationController .update()" should {
@@ -131,6 +151,15 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
 
   "ApplicationController .delete()" should {
 
+    "return Accepted" in{
+      val writeResult: WriteResult = LastError(ok = true, None, None, None, 0, None, updatedExisting = false, None, None, wtimeout = false, None, None)
+
+      when(mockDataRepository.delete("_id":String))
+          .thenReturn(Future(writeResult))
+
+      val result = TestApplicationController.delete("_id":String)(FakeRequest())
+      status(result) shouldBe Status.ACCEPTED
+    }
   }
 
 
