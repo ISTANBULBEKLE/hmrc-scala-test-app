@@ -64,7 +64,15 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
 //      status(result) shouldBe Status.OK
 //      await(jsonBodyOf(result)) shouldBe jsonBody
 //    }
-
+//    "return an error" in {
+//      when(mockDataRepository.find(any()))
+//          .thenReturn(Future.failed(GenericDriverException("Error")))
+//
+//      val result = TestApplicationController.create()(FakeRequest().withBody(jsonBody))
+//
+//      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+//      await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+//    }
 
   }
 
