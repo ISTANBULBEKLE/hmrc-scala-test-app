@@ -72,7 +72,7 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
         val result = TestApplicationController.index()(FakeRequest())
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error retrieving data from Mongo").toString()
       }
     }
 
@@ -160,7 +160,7 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
         val result = TestApplicationController.read("_id":String)(FakeRequest())
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error retrieving individual data from Mongo").toString()
       }
     }
 
@@ -215,7 +215,7 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
         val result = TestApplicationController.update("_id":String)(FakeRequest().withBody(jsonBody))
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error updating item to Mongo").toString()
       }
     }
 
@@ -249,7 +249,7 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
         val result = TestApplicationController.delete("_id":String)(FakeRequest())
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error deleting item from Mongo").toString()
       }
     }
   }

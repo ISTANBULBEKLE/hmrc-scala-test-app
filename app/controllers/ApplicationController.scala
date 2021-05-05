@@ -16,7 +16,7 @@ class ApplicationController @Inject()(val controllerComponents: ControllerCompon
   def index(): Action[AnyContent] = Action.async { implicit request =>
     dataRepository.find().map(items => Ok(Json.toJson(items))) recover {
       case _: ReactiveMongoException => InternalServerError(Json.obj(
-        "message" -> "Error adding item to Mongo"
+        "message" -> "Error retrieving data from Mongo"
       ))
     }
   }
@@ -24,7 +24,7 @@ class ApplicationController @Inject()(val controllerComponents: ControllerCompon
   def read(id: String): Action[AnyContent] = Action.async { implicit request =>
     dataRepository.read(id).map(items => Ok(Json.toJson(items))) recover {
       case _: ReactiveMongoException => InternalServerError(Json.obj(
-        "message" -> "Error adding item to Mongo"
+        "message" -> "Error retrieving individual data from Mongo"
       ))
     }
   }
@@ -32,7 +32,7 @@ class ApplicationController @Inject()(val controllerComponents: ControllerCompon
   def delete(id: String): Action[AnyContent] = Action.async { implicit request =>
     dataRepository.delete(id).map(_ => Accepted ) recover {
       case _: ReactiveMongoException => InternalServerError(Json.obj(
-        "message" -> "Error adding item to Mongo"
+        "message" -> "Error deleting item from Mongo"
       ))
     }
   }
@@ -54,7 +54,7 @@ class ApplicationController @Inject()(val controllerComponents: ControllerCompon
       case JsSuccess(dataModel, _) =>
         dataRepository.update(dataModel).map(result => Accepted(Json.toJson(result))) recover {
           case _: ReactiveMongoException => InternalServerError(Json.obj(
-            "message" -> "Error adding item to Mongo"
+            "message" -> "Error updating item to Mongo"
           ))
         }
       case JsError(_) => Future(BadRequest)
