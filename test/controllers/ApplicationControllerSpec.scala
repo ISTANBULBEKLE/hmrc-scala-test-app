@@ -1,6 +1,7 @@
 package controllers
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.util.FastFuture.failed
 import akka.stream.ActorMaterializer
 import models.DataModel
 import org.scalatest.mockito.MockitoSugar
@@ -17,6 +18,7 @@ import org.mockito.Mockito._
 import play.api.libs.json.{JsObject, Json}
 import reactivemongo.api.commands.{LastError, WriteResult}
 import reactivemongo.core.errors.GenericDriverException
+
 
 
 
@@ -53,26 +55,26 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
     }
 
 
-//    "checking JSON body" in {
-//      val jsonBody: JsObject = Json.obj(
-//        "_id" -> "abcd",
-//        "name" -> "test name",
-//        "description" -> "test description",
-//        "numSales" -> 100
-//      )
-//      val result = TestApplicationController.index()(FakeRequest())
-//      status(result) shouldBe Status.OK
-//      await(jsonBodyOf(result)) shouldBe jsonBody
-//    }
-//    "return an error" in {
-//      when(mockDataRepository.find(any()))
-//          .thenReturn(Future.failed(GenericDriverException("Error")))
-//
-//      val result = TestApplicationController.create()(FakeRequest().withBody(jsonBody))
-//
-//      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-//      await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
-//    }
+    "the mongo data creation failed" should {
+
+      val jsonBody: JsObject = Json.obj(
+        "_id" -> "abcd",
+        "name" -> "test name",
+        "description" -> "test description",
+        "numSales" -> 100
+      )
+
+      "return an error" in {
+
+        when(mockDataRepository.find(any())(any()))
+            .thenReturn(Future(failed(GenericDriverException("Error"))))
+
+        val result = TestApplicationController.index()(FakeRequest())
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+      }
+    }
 
   }
 
@@ -140,6 +142,29 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
       val result = TestApplicationController.read("_id":String)(FakeRequest())
       status(result) shouldBe Status.OK
     }
+
+    "the mongo data creation failed" should {
+
+      val jsonBody: JsObject = Json.obj(
+        "_id" -> "abcd",
+        "name" -> "test name",
+        "description" -> "test description",
+        "numSales" -> 100
+      )
+
+      "return an error" in {
+
+        when(mockDataRepository.read(any()))
+            .thenReturn(Future(failed(GenericDriverException("Error"))))
+
+        val result = TestApplicationController.read("_id":String)(FakeRequest())
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+      }
+    }
+
+
   }
 
   "ApplicationController .update()" should {
@@ -174,6 +199,26 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
 
         }
 
+    "the mongo data creation failed" should {
+
+      val jsonBody: JsObject = Json.obj(
+        "_id" -> "abcd",
+        "name" -> "test name",
+        "description" -> "test description",
+        "numSales" -> 100
+      )
+
+      "return an error" in {
+        when(mockDataRepository.update(any()))
+            .thenReturn(Future.failed(GenericDriverException("Error")))
+
+        val result = TestApplicationController.update("_id":String)(FakeRequest().withBody(jsonBody))
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+      }
+    }
+
   }
 
   "ApplicationController .delete()" should {
@@ -185,6 +230,27 @@ class ApplicationControllerSpec extends UnitSpec with GuiceOneAppPerSuite with M
 
       val result = TestApplicationController.delete("_id":String)(FakeRequest())
       status(result) shouldBe Status.ACCEPTED
+    }
+
+    "the mongo data creation failed" should {
+
+      val jsonBody: JsObject = Json.obj(
+        "_id" -> "abcd",
+        "name" -> "test name",
+        "description" -> "test description",
+        "numSales" -> 100
+      )
+
+      "return an error" in {
+
+        when(mockDataRepository.delete("_id":String))
+            .thenReturn(Future(failed(GenericDriverException("Error"))))
+
+        val result = TestApplicationController.delete("_id":String)(FakeRequest())
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        await(bodyOf(result)) shouldBe Json.obj("message" -> "Error adding item to Mongo").toString()
+      }
     }
   }
 
